@@ -7,10 +7,11 @@ Created on Tue Sep 27 19:45:40 2016
 
 import pandas as pd
 import numpy as np
+from utils import display_evaluation_metrics, display_confusion_matrix, display_classification_report
+from normalization import normalize_accented_characters, html_parser, strip_html
 
 
-
-dataset = pd.read_csv(r'E:/aclImdb/movie_reviews.csv')
+dataset = pd.read_csv(r'../aclImdb/movie_reviews.csv')
 
 print dataset.head()
 
@@ -22,13 +23,11 @@ test_sentiments = np.array(test_data['sentiment'])
 
 
 sample_docs = [100, 5817, 7626, 7356, 1008, 7155, 3533, 13010]
-sample_data = [(test_reviews[index],
-                test_sentiments[index])
-                  for index in sample_docs]
+sample_data = [(test_reviews[index], test_sentiments[index])
+               for index in sample_docs]
 
-
-sample_data        
-
+sample_data
+# %%
 
 from afinn import Afinn
 afn = Afinn(emoticons=True) 
@@ -46,7 +45,6 @@ print 'Positive Polarity Score:', good.pos_score()
 print 'Negative Polarity Score:', good.neg_score()
 print 'Objective Score:', good.obj_score()
 
-from normalization import normalize_accented_characters, html_parser, strip_html
 
 def analyze_sentiment_sentiwordnet_lexicon(review,
                                            verbose=False):
@@ -112,7 +110,6 @@ for review, review_sentiment in sample_data:
 sentiwordnet_predictions = [analyze_sentiment_sentiwordnet_lexicon(review)
                             for review in test_reviews]
 
-from utils import display_evaluation_metrics, display_confusion_matrix, display_classification_report
 
 print 'Performance metrics:'
 display_evaluation_metrics(true_labels=test_sentiments,
@@ -193,8 +190,9 @@ display_classification_report(true_labels=test_sentiments,
                               classes=['positive', 'negative']) 
 
   
-
+# %%
 from pattern.en import sentiment, mood, modality
+
 
 def analyze_sentiment_pattern_lexicon(review, threshold=0.1,
                                       verbose=False):
@@ -208,7 +206,7 @@ def analyze_sentiment_pattern_lexicon(review, threshold=0.1,
     sentiment_subjectivity = round(analysis[1], 2)
     # get final sentiment
     final_sentiment = 'positive' if sentiment_score >= threshold\
-                                   else 'negative'
+        else 'negative'
     if verbose:
         # display detailed sentiment statistics
         sentiment_frame = pd.DataFrame([[final_sentiment, sentiment_score,
@@ -226,9 +224,8 @@ def analyze_sentiment_pattern_lexicon(review, threshold=0.1,
                                                               labels=[[0,0,0,0],[0,1,2,3]]))
         print assessment_frame
         print
-    
-    return final_sentiment                                       
-    
+
+    return final_sentiment
 
 for review, review_sentiment in sample_data:
     print 'Review:'
@@ -240,39 +237,31 @@ for review, review_sentiment in sample_data:
                                                         threshold=0.1,
                                                         verbose=True)
     print '-'*60            
-      
+
 for review, review_sentiment in sample_data:
     print 'Review:'
     print review
-    print 'Labeled Sentiment:', review_sentiment 
+    print 'Labeled Sentiment:', review_sentiment
     print 'Mood:', mood(review)
     mod_score = modality(review)
     print 'Modality Score:', round(mod_score, 2)
     print 'Certainty:', 'Strong' if mod_score > 0.5 \
-                                    else 'Medium' if mod_score > 0.35 \
-                                                    else 'Low'
-    print '-'*60            
+        else 'Medium' if mod_score > 0.35 \
+        else 'Low'
+    print '-'*60
 
-                  
-
-
-
-
-                               
-                                
 pattern_predictions = [analyze_sentiment_pattern_lexicon(review, threshold=0.1)
-                            for review in test_reviews]     
+                       for review in test_reviews]
 
-                              
 print 'Performance metrics:'
 display_evaluation_metrics(true_labels=test_sentiments,
                            predicted_labels=pattern_predictions,
-                           positive_class='positive')  
-print '\nConfusion Matrix:'                           
+                           positive_class='positive')
+print '\nConfusion Matrix:'
 display_confusion_matrix(true_labels=test_sentiments,
                          predicted_labels=pattern_predictions,
                          classes=['positive', 'negative'])
-print '\nClassification report:'                         
+print '\nClassification report:'
 display_classification_report(true_labels=test_sentiments,
                               predicted_labels=pattern_predictions,
-                              classes=['positive', 'negative'])                               
+                              classes=['positive', 'negative'])

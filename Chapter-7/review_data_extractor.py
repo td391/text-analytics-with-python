@@ -7,9 +7,9 @@ Created on Mon Sep 26 01:27:49 2016
 
 # download dataset from http://ai.stanford.edu/~amaas/data/sentiment/
 
-# change the directory path to your path 
+# change the directory path to your path
 # path should point to the unzipped directory with reviews
-# I had unzipped it to E:/aclImdb
+# I had unzipped it to ./aclImdb
 
 import os
 import pandas as pd
@@ -20,11 +20,11 @@ labels = {'pos': 'positive', 'neg': 'negative'}
 dataset = pd.DataFrame()
 for directory in ('test', 'train'):
     for sentiment in ('pos', 'neg'):
-        path =r'E:/aclImdb/{}/{}'.format(directory, sentiment)
+        path = r'./aclImdb/{}/{}'.format(directory, sentiment)
         for review_file in os.listdir(path):
             with open(os.path.join(path, review_file), 'r') as input_file:
                 review = input_file.read()
-            dataset = dataset.append([[review, labels[sentiment]]], 
+            dataset = dataset.append([[review, labels[sentiment]]],
                                      ignore_index=True)
 
 dataset.columns = ['review', 'sentiment']
@@ -35,4 +35,5 @@ indices = np.array(indices)
 
 dataset = dataset.reindex(index=indices)
 
-dataset.to_csv('movie_reviews.csv', index=False)
+dataset.to_csv('./aclImdb/movie_reviews.csv', index=False)
+# %%
